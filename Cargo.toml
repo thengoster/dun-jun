@@ -1,5 +1,5 @@
 [package]
-name = "dungeoncrawl"
+name = "dun-jun"
 version = "0.1.0"
 edition = "2021"
 
@@ -7,3 +7,4 @@ edition = "2021"
 
 [dependencies]
 bracket-lib = "~0.8.1"
+legion = "=0.3.1"
