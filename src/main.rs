@@ -1,5 +1,3 @@
-#![warn(clippy::pedantic)]
-
 mod camera;
 mod components;
 mod map;
@@ -44,7 +42,8 @@ impl State {
         let map_builder = MapBuilder::new(&mut rng);
         spawn_player(&mut ecs, map_builder.player_start);
         spawn_amulet_of_yala(&mut ecs, map_builder.amulet_start);
-        map_builder.monster_spawns
+        map_builder
+            .monster_spawns
             .iter()
             .for_each(|pos| spawn_monster(&mut ecs, &mut rng, *pos));
 
@@ -68,7 +67,8 @@ impl State {
         let map_builder = MapBuilder::new(&mut rng);
         spawn_player(&mut self.ecs, map_builder.player_start);
         spawn_amulet_of_yala(&mut self.ecs, map_builder.amulet_start);
-        map_builder.monster_spawns
+        map_builder
+            .monster_spawns
             .iter()
             .for_each(|pos| spawn_monster(&mut self.ecs, &mut rng, *pos));
         self.resources.insert(map_builder.map);
@@ -143,7 +143,7 @@ impl GameState for State {
         ctx.set_active_console(0);
         self.resources.insert(Point::from_tuple(ctx.mouse_pos()));
 
-        let current_state = self.resources.get::<TurnState>().unwrap().clone();
+        let current_state = *self.resources.get::<TurnState>().unwrap();
         match current_state {
             TurnState::AwaitingInput => self
                 .input_systems
