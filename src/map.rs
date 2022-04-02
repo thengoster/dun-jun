@@ -13,12 +13,14 @@ pub fn map_idx(x: i32, y: i32) -> usize {
 
 pub struct Map {
     pub tiles: Vec<TileType>,
+    pub revealed_tiles: Vec<bool>
 }
 
 impl Map {
     pub fn new() -> Self {
         Self {
             tiles: vec![TileType::Floor; NUM_TILES],
+            revealed_tiles: vec![false; NUM_TILES]
         }
     }
 
@@ -82,5 +84,9 @@ impl BaseMap for Map {
 
     fn get_pathing_distance(&self, idx1: usize, idx2: usize) -> f32 {
         DistanceAlg::Pythagoras.distance2d(self.index_to_point2d(idx1), self.index_to_point2d(idx2))
+    }
+
+    fn is_opaque(&self, idx: usize) -> bool {
+        self.tiles[idx as usize] != TileType::Floor
     }
 }
