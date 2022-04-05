@@ -50,19 +50,29 @@ Templates(
             entity_type: Item,
             name : "Rusty Sword", glyph : 's', levels : [ 0, 1, 2 ],
             frequency: 1,
-            base_damage: Some(1)
+            base_damage: Some(1),
+            durability: Some(1)
         ),
         Template(
             entity_type: Item,
             name : "Shiny Sword", glyph : 'S', levels : [ 0, 1, 2 ],
             frequency: 1,
-            base_damage: Some(2)
+            base_damage: Some(2),
+            durability: Some(2)
         ),
         Template(
             entity_type: Item,
             name : "Huge Sword", glyph : '/', levels : [ 1, 2 ],
             frequency: 1,
-            base_damage: Some(3)
+            base_damage: Some(3),
+            durability: Some(3)
+        ),
+        Template(
+            entity_type: Item,
+            name : "Shovel", glyph : 'D', levels : [ 0, 1, 2 ],
+            provides: Some([ ("Digging", 0) ]),
+            frequency: 2,
+            durability: Some(5)
         ),
     ],
 )

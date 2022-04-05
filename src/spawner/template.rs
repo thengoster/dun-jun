@@ -14,6 +14,7 @@ pub struct Template {
     pub provides: Option<Vec<(String, i32)>>,
     pub hp: Option<i32>,
     pub base_damage: Option<i32>,
+    pub durability: Option<i32>,
 }
 
 #[derive(Clone, Deserialize, Debug, PartialEq)]
@@ -91,6 +92,7 @@ impl Templates {
                 .for_each(|(provides, n)| match provides.as_str() {
                     "Healing" => commands.add_component(entity, ProvidesHealing { amount: *n }),
                     "MagicMap" => commands.add_component(entity, ProvidesDungeonMap {}),
+                    "Digging" => commands.add_component(entity, ProvidesDigging {}),
                     _ => {
                         println!("Warning: we don't know how to provide {}", provides);
                     }
@@ -102,6 +104,10 @@ impl Templates {
             if template.entity_type == EntityType::Item {
                 commands.add_component(entity, Weapon {});
             }
+        }
+
+        if let Some(durability) = &template.durability {
+            commands.add_component(entity, Durability(*durability));
         }
     }
 }

@@ -31,13 +31,22 @@ pub fn combat(ecs: &mut SubWorld, commands: &mut CommandBuffer) {
             0
         };
 
-        let weapon_damage: i32 = <(&Carried, &Damage)>::query()
+        let mut weapon = <(Entity, &Carried, &Damage)>::query();
+
+        let weapon_damage: i32 = weapon
             .iter(ecs)
-            .filter(|(carried, _)| carried.0 == *attacker)
-            .map(|(_, dmg)| dmg.0)
+            .filter(|(_, carried, _)| carried.0 == *attacker)
+            .map(|(_, _, dmg)| dmg.0)
             .sum();
 
         let final_damage = base_damage + weapon_damage;
+
+        weapon
+            .iter(ecs)
+            .filter(|(_, carried, _)| carried.0 == *attacker)
+            .for_each(|(entity, _, _)| {
+                commands.push(((), ReduceDurability { entity: *entity }));
+            });
 
         if let Ok(mut health) = ecs
             .entry_mut(*victim)

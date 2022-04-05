@@ -96,3 +96,14 @@ pub struct Damage(pub i32);
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Weapon;
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct Durability(pub i32);
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct ProvidesDigging;
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct ReduceDurability {
+    pub entity: Entity,
+}
