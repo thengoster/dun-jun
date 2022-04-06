@@ -21,7 +21,6 @@ pub trait MapTheme: Sync + Send {
     fn tile_to_render(&self, tile_type: TileType) -> FontCharType;
 }
 
-const NUM_ROOMS: usize = 20;
 pub struct MapBuilder {
     pub map: Map,
     pub rooms: Vec<Rect>,
@@ -44,6 +43,10 @@ impl MapBuilder {
         mb.theme = match rng.range(0, 2) {
             0 => DungeonTheme::new(),
             _ => ForestTheme::new(),
+        };
+
+        if let 0 = rng.range(0, 3) {
+            mb.amulet_start = mb.random_spawn_location(&mb.player_start, rng);
         };
 
         mb
@@ -76,7 +79,8 @@ impl MapBuilder {
     }
 
     fn build_random_rooms(&mut self, rng: &mut RandomNumberGenerator) {
-        while self.rooms.len() < NUM_ROOMS {
+        let num_rooms = rng.range(10, 30);
+        while self.rooms.len() < num_rooms {
             let room = Rect::with_size(
                 rng.range(1, SCREEN_WIDTH - 10),
                 rng.range(1, SCREEN_HEIGHT - 10),
@@ -138,6 +142,25 @@ impl MapBuilder {
                 self.apply_horizontal_tunnel(prev.x, new.x, new.y);
             }
         }
+    }
+
+    fn random_spawn_location(&self, start: &Point, rng: &mut RandomNumberGenerator) -> Point {
+        let spawnable_tiles: Vec<Point> = self
+            .map
+            .tiles
+            .iter()
+            .enumerate()
+            .filter(|(idx, t)| {
+                **t == TileType::Floor
+                    && DistanceAlg::Pythagoras.distance2d(*start, self.map.index_to_point2d(*idx))
+                        > 10.0
+                    && !self.monster_spawns.contains(&self.map.index_to_point2d(*idx))
+            })
+            .map(|(idx, _)| self.map.index_to_point2d(idx))
+            .collect();
+
+        let target_index = rng.random_slice_index(&spawnable_tiles).unwrap();
+        spawnable_tiles[target_index]
     }
 
     fn spawn_monsters(&self, start: &Point, rng: &mut RandomNumberGenerator) -> Vec<Point> {

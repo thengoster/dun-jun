@@ -77,56 +77,70 @@ impl State {
     }
 
     fn game_over(&mut self, ctx: &mut BTerm) {
-        ctx.set_active_console(2);
-        ctx.print_color_centered(2, RED, BLACK, "Your quest has ended.");
-        ctx.print_color_centered(
-            4,
-            WHITE,
-            BLACK,
+        let mut draw_batch = DrawBatch::new();
+        draw_batch.target(2);
+        draw_batch.print_color_centered(2, "Your quest has ended.", ColorPair::new(RED, BLACK));
+        <&Player>::query().iter(&self.ecs).for_each(|player| {
+            let achieved_score_str = format!("You achieved a score of {}!", player.score);
+            draw_batch.print_color_centered(3, achieved_score_str, ColorPair::new(YELLOW, BLACK));
+        });
+        draw_batch.print_color_centered(
+            5,
             "Slain by a monster, your hero's journey has come to a \
             premature end.",
+            ColorPair::new(WHITE, BLACK),
         );
-        ctx.print_color_centered(
-            5,
-            WHITE,
-            BLACK,
+        draw_batch.print_color_centered(
+            6,
             "The Amulet of Yala remains unclaimed, and your home town \
             is not saved.",
+            ColorPair::new(WHITE, BLACK),
         );
-        ctx.print_color_centered(
-            8,
-            YELLOW,
-            BLACK,
+        draw_batch.print_color_centered(
+            7,
             "Don't worry, you can always try again with a new hero.",
+            ColorPair::new(YELLOW, BLACK),
         );
-        ctx.print_color_centered(9, GREEN, BLACK, "Press 1 to play again.");
+        draw_batch.print_color_centered(9, "Press 1 to play again.", ColorPair::new(GREEN, BLACK));
 
         if let Some(VirtualKeyCode::Key1) = ctx.key {
             self.reset_game_state();
         }
+
+        draw_batch.submit(0).expect("Batch error");
     }
 
     fn victory(&mut self, ctx: &mut BTerm) {
-        ctx.set_active_console(2);
-        ctx.print_color_centered(2, GREEN, BLACK, "You have won!");
-        ctx.print_color_centered(
-            4,
-            WHITE,
-            BLACK,
+        // ctx.set_active_console(2);
+        let mut draw_batch = DrawBatch::new();
+        draw_batch.target(2);
+        draw_batch.print_color_centered(2, "You have won!", ColorPair::new(GREEN, BLACK));
+        <&Player>::query().iter(&self.ecs).for_each(|player| {
+            const SCORE_FOR_VICTORY: u32 = 50000;
+            let achieved_score_str = format!(
+                "You achieved a score of {}!",
+                player.score + SCORE_FOR_VICTORY
+            );
+            draw_batch.print_color_centered(3, achieved_score_str, ColorPair::new(GOLD, BLACK));
+        });
+        draw_batch.print_color_centered(
+            5,
             "You put on the Amulet of Yala and feel its power course through \
             your veins.",
+            ColorPair::new(WHITE, BLACK),
         );
-        ctx.print_color_centered(
-            5,
-            WHITE,
-            BLACK,
+        draw_batch.print_color_centered(
+            6,
             "Your town is saved, and you can return to your normal life.",
+            ColorPair::new(WHITE, BLACK),
         );
-        ctx.print_color_centered(7, GREEN, BLACK, "Press 1 to play again.");
+        draw_batch.print_color_centered(8, "Press 1 to play again.", ColorPair::new(GREEN, BLACK));
 
         if let Some(VirtualKeyCode::Key1) = ctx.key {
             self.reset_game_state();
         }
+
+        draw_batch.submit(0).expect("Batch error");
     }
 
     fn advance_level(&mut self) {
@@ -168,6 +182,7 @@ impl State {
             .for_each(|(player, pos)| {
                 player.map_level += 1;
                 map_level = player.map_level;
+                player.score += 10000;
                 pos.x = map_builder.player_start.x;
                 pos.y = map_builder.player_start.y;
             });

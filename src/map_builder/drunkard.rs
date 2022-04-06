@@ -3,7 +3,7 @@ use crate::prelude::*;
 
 const STAGGER_DISTANCE: usize = 400;
 const NUM_TILES: usize = (SCREEN_WIDTH * SCREEN_HEIGHT) as usize;
-const DESIRED_FLOOR: usize = NUM_TILES / 3;
+const DESIRED_FLOOR: usize = NUM_TILES * 3 / 4;
 
 pub struct DrunkardsWalkArchitect {}
 
