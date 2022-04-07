@@ -154,7 +154,9 @@ impl MapBuilder {
                 **t == TileType::Floor
                     && DistanceAlg::Pythagoras.distance2d(*start, self.map.index_to_point2d(*idx))
                         > 10.0
-                    && !self.monster_spawns.contains(&self.map.index_to_point2d(*idx))
+                    && !self
+                        .monster_spawns
+                        .contains(&self.map.index_to_point2d(*idx))
             })
             .map(|(idx, _)| self.map.index_to_point2d(idx))
             .collect();

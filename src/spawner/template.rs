@@ -15,6 +15,7 @@ pub struct Template {
     pub hp: Option<i32>,
     pub base_damage: Option<i32>,
     pub durability: Option<i32>,
+    pub ai: Option<Vec<String>>,
 }
 
 #[derive(Clone, Deserialize, Debug, PartialEq)]
@@ -75,7 +76,6 @@ impl Templates {
             EntityType::Enemy => {
                 commands.add_component(entity, Enemy {});
                 commands.add_component(entity, FieldOfView::new(6));
-                commands.add_component(entity, ChasingPlayer {});
                 commands.add_component(
                     entity,
                     Health {
@@ -83,6 +83,14 @@ impl Templates {
                         max: template.hp.unwrap(),
                     },
                 );
+                if let Some(ai) = &template.ai {
+                    ai.iter().for_each(|ai_type| match ai_type.as_str() {
+                        "Random" => commands.add_component(entity, MovingRandomly {}),
+                        _ => commands.add_component(entity, ChasingPlayer {}),
+                    });
+                } else {
+                    commands.add_component(entity, ChasingPlayer {});
+                }
             }
         }
 
