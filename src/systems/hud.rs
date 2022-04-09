@@ -6,7 +6,7 @@ use crate::prelude::*;
 #[read_component(Item)]
 #[read_component(Carried)]
 #[read_component(Name)]
-pub fn hud(ecs: &SubWorld) {
+pub fn hud(ecs: &SubWorld, #[resource] timer: &mut Timer, #[resource] time_elapsed: &f32) {
     let mut health_query = <&Health>::query().filter(component::<Player>());
     let player_health = health_query.iter(ecs).next().unwrap();
 
@@ -43,6 +43,13 @@ pub fn hud(ecs: &SubWorld) {
     draw_batch.print_color_right(
         Point::new(SCREEN_WIDTH * 2, 2),
         format!("Score: {}", score),
+        ColorPair::new(YELLOW, BLACK),
+    );
+
+    timer.add(*time_elapsed);
+    draw_batch.print_color_right(
+        Point::new(SCREEN_WIDTH * 2, 3),
+        format!("Time: {}", timer.get_time_string()),
         ColorPair::new(YELLOW, BLACK),
     );
 

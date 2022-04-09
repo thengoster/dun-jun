@@ -1,10 +1,8 @@
-mod camera;
 mod components;
-mod map;
 mod map_builder;
+mod resources;
 mod spawner;
 mod systems;
-mod turn_state;
 
 mod prelude {
     pub use bracket_lib::prelude::*;
@@ -15,13 +13,11 @@ mod prelude {
     pub const SCREEN_HEIGHT: i32 = 50;
     pub const DISPLAY_WIDTH: i32 = SCREEN_WIDTH / 2;
     pub const DISPLAY_HEIGHT: i32 = SCREEN_HEIGHT / 2;
-    pub use crate::camera::*;
     pub use crate::components::*;
-    pub use crate::map::*;
     pub use crate::map_builder::*;
+    pub use crate::resources::*;
     pub use crate::spawner::*;
     pub use crate::systems::*;
-    pub use crate::turn_state::*;
 }
 
 use prelude::*;
@@ -50,6 +46,7 @@ impl State {
         resources.insert(Camera::new(map_builder.player_start));
         resources.insert(TurnState::AwaitingInput);
         resources.insert(map_builder.theme);
+        resources.insert(Timer::new());
 
         Self {
             ecs,
@@ -74,6 +71,7 @@ impl State {
         self.resources.insert(Camera::new(map_builder.player_start));
         self.resources.insert(TurnState::AwaitingInput);
         self.resources.insert(map_builder.theme);
+        self.resources.insert(Timer::new());
     }
 
     fn game_over(&mut self, ctx: &mut BTerm) {
@@ -84,24 +82,30 @@ impl State {
             let achieved_score_str = format!("You achieved a score of {}!", player.score);
             draw_batch.print_color_centered(3, achieved_score_str, ColorPair::new(YELLOW, BLACK));
         });
+
+        if let Some(timer) = self.resources.get::<Timer>() {
+            let timer_str = format!("You lasted in the dungeon for {}", timer.get_time_string());
+            draw_batch.print_color_centered(4, timer_str, ColorPair::new(GOLD, BLACK));
+        }
+
         draw_batch.print_color_centered(
-            5,
+            6,
             "Slain by a monster, your hero's journey has come to a \
             premature end.",
             ColorPair::new(WHITE, BLACK),
         );
         draw_batch.print_color_centered(
-            6,
+            7,
             "The Amulet of Yala remains unclaimed, and your home town \
             is not saved.",
             ColorPair::new(WHITE, BLACK),
         );
         draw_batch.print_color_centered(
-            7,
+            8,
             "Don't worry, you can always try again with a new hero.",
             ColorPair::new(YELLOW, BLACK),
         );
-        draw_batch.print_color_centered(9, "Press 1 to play again.", ColorPair::new(GREEN, BLACK));
+        draw_batch.print_color_centered(10, "Press 1 to play again.", ColorPair::new(GREEN, BLACK));
 
         if let Some(VirtualKeyCode::Key1) = ctx.key {
             self.reset_game_state();
@@ -111,7 +115,6 @@ impl State {
     }
 
     fn victory(&mut self, ctx: &mut BTerm) {
-        // ctx.set_active_console(2);
         let mut draw_batch = DrawBatch::new();
         draw_batch.target(2);
         draw_batch.print_color_centered(2, "You have won!", ColorPair::new(GREEN, BLACK));
@@ -123,18 +126,24 @@ impl State {
             );
             draw_batch.print_color_centered(3, achieved_score_str, ColorPair::new(GOLD, BLACK));
         });
+
+        if let Some(timer) = self.resources.get::<Timer>() {
+            let timer_str = format!("The Dun-Jun was completed in {}", timer.get_time_string());
+            draw_batch.print_color_centered(4, timer_str, ColorPair::new(GOLD, BLACK));
+        }
+
         draw_batch.print_color_centered(
-            5,
+            6,
             "You put on the Amulet of Yala and feel its power course through \
             your veins.",
             ColorPair::new(WHITE, BLACK),
         );
         draw_batch.print_color_centered(
-            6,
+            7,
             "Your town is saved, and you can return to your normal life.",
             ColorPair::new(WHITE, BLACK),
         );
-        draw_batch.print_color_centered(8, "Press 1 to play again.", ColorPair::new(GREEN, BLACK));
+        draw_batch.print_color_centered(9, "Press 1 to play again.", ColorPair::new(GREEN, BLACK));
 
         if let Some(VirtualKeyCode::Key1) = ctx.key {
             self.reset_game_state();
@@ -204,6 +213,7 @@ impl State {
         self.resources.insert(Camera::new(map_builder.player_start));
         self.resources.insert(TurnState::AwaitingInput);
         self.resources.insert(map_builder.theme);
+        // self.resources.insert(Timer::new()); TODO: Timer is dungeon timer, not per level...maybe have two timers in future?
     }
 }
 
@@ -217,6 +227,7 @@ impl GameState for State {
         ctx.cls();
 
         self.resources.insert(ctx.key);
+        self.resources.insert(ctx.frame_time_ms);
         ctx.set_active_console(0);
         self.resources.insert(Point::from_tuple(ctx.mouse_pos()));
 
