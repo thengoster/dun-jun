@@ -4,7 +4,7 @@ use crate::prelude::*;
 pub struct CellularAutomataArchitect {}
 
 impl MapArchitect for CellularAutomataArchitect {
-    fn new(&mut self, rng: &mut RandomNumberGenerator) -> MapBuilder {
+    fn new_map_builder(&mut self, rng: &mut RandomNumberGenerator) -> MapBuilder {
         let mut mb = MapBuilder {
             map: Map::new(),
             rooms: Vec::new(),

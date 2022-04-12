@@ -2,7 +2,7 @@ use crate::prelude::*;
 
 #[system]
 #[read_component(WantsToAttack)]
-#[read_component(Player)]
+#[write_component(Player)]
 #[write_component(Health)]
 #[read_component(Damage)]
 #[read_component(Carried)]
@@ -56,6 +56,10 @@ pub fn combat(ecs: &mut SubWorld, commands: &mut CommandBuffer) {
             health.current -= final_damage;
             if health.current < 1 && !is_player {
                 commands.remove(*victim);
+                <(Entity, &mut Player)>::query()
+                    .iter_mut(ecs)
+                    .filter(|(entity, _)| *entity == attacker)
+                    .for_each(|(_, player)| player.score += 1000);
             }
         }
         commands.remove(*message);

@@ -13,8 +13,7 @@ mod themes;
 pub use themes::*;
 
 trait MapArchitect {
-    #[allow(clippy::new_ret_no_self)]
-    fn new(&mut self, rng: &mut RandomNumberGenerator) -> MapBuilder;
+    fn new_map_builder(&mut self, rng: &mut RandomNumberGenerator) -> MapBuilder;
 }
 
 pub trait MapTheme: Sync + Send {
@@ -37,7 +36,7 @@ impl MapBuilder {
             1 => Box::new(CellularAutomataArchitect {}),
             _ => Box::new(DrunkardsWalkArchitect {}),
         };
-        let mut mb = architect.new(rng);
+        let mut mb = architect.new_map_builder(rng);
         apply_prefab(&mut mb, rng);
 
         mb.theme = match rng.range(0, 2) {
