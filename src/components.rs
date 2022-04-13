@@ -108,3 +108,8 @@ pub struct ProvidesDigging;
 pub struct ReduceDurability {
     pub entity: Entity,
 }
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct ProvidesVision {
+    pub amount: i32,
+}

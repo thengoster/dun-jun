@@ -75,5 +75,11 @@ Templates(
             frequency: 2,
             durability: Some(5)
         ),
+        Template(
+            entity_type: Item,
+            name : "Binoculars", glyph : 'B', levels : [ 0, 1, 2 ],
+            provides: Some([ ("Vision", 1) ]),
+            frequency: 1,
+        ),
     ],
 )

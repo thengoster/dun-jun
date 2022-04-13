@@ -101,6 +101,7 @@ impl Templates {
                     "Healing" => commands.add_component(entity, ProvidesHealing { amount: *n }),
                     "MagicMap" => commands.add_component(entity, ProvidesDungeonMap {}),
                     "Digging" => commands.add_component(entity, ProvidesDigging {}),
+                    "Vision" => commands.add_component(entity, ProvidesVision { amount: *n }),
                     _ => {
                         println!("Warning: we don't know how to provide {}", provides);
                     }
